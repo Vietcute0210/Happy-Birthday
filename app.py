@@ -10,7 +10,7 @@ import qrcode
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'replace-this-with-a-secret'
 # SQLite DB file
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wishes.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/wishes.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
