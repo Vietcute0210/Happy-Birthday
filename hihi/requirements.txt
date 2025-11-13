@@ -1,0 +1,4 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.3
+qrcode==7.4
+Pillow==10.1.0

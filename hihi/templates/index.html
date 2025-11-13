@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Quản lý Sổ lời chúc</title>
+    <style>
+      body {
+        font-family: Arial;
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 10px;
+      }
+      .card {
+        border: 1px solid #ddd;
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+      }
+      input,
+      button {
+        padding: 8px;
+        margin: 6px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Quản lý Sổ lời chúc</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for cat, msg in messages %}
+    <div style="padding: 8px; background: #eee; margin-bottom: 8px">
+      {{ msg }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <div class="card">
+      <h3>Tạo sự kiện mới</h3>
+      <form method="post" action="{{ url_for('create_event') }}">
+        <label
+          >Tên sự kiện / người sinh nhật<br />
+          <input name="name" placeholder="VD: Sinh nhật Minh" /> </label
+        ><br />
+        <label
+          >Slug (phần URL, không dấu, kẹp bằng - )<br />
+          <input name="slug" placeholder="VD: minh-25" /> </label
+        ><br />
+        <button type="submit">Tạo</button>
+      </form>
+    </div>
+
+    <h3>Sự kiện</h3>
+    {% for ev in events %}
+    <div class="card">
+      <strong>{{ ev.name }}</strong> — <small>{{ ev.slug }}</small><br />
+      QR:
+      <a href="{{ url_for('qr_image', slug=ev.slug) }}" target="_blank"
+        >Xem PNG</a
+      >
+      | Link:
+      <a href="{{ url_for('wish_form', slug=ev.slug) }}" target="_blank"
+        >Mở trang gửi lời chúc</a
+      >
+      | Admin: <a href="{{ url_for('admin_view', slug=ev.slug) }}">Quản lý</a>
+    </div>
+    {% else %}
+    <p>Chưa có sự kiện nào.</p>
+    {% endfor %}
+
+    <h3>Xóa Sự kiện</h3>
+    {% for ev in events %}
+    <div class="card">
+      <strong>{{ ev.name }}</strong> — <small>{{ ev.slug }}</small>
+      <form
+        action="{{ url_for('delete_event', event_id=ev.id) }}"
+        method="POST"
+        style="display: inline; margin-left: 20px"
+        onsubmit="return confirm('Bạn có chắc chắn muốn xóa sự kiện {{ ev.name }} và TẤT CẢ lời chúc không?');"
+      >
+        <button
+          type="submit"
+          style="
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+          "
+        >
+          Xóa vĩnh viễn
+        </button>
+      </form>
+      | <a href="{{ url_for('admin_view', slug=ev.slug) }}">Quản lý Lời Chúc</a>
+    </div>
+    {% endfor %}
+  </body>
+</html>

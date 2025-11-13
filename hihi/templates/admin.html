@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Admin - {{ event.name }}</title>
+    <style>
+      body {
+        font-family: Arial;
+        max-width: 900px;
+        margin: 10px auto;
+        padding: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        padding: 8px;
+        border: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Quản lý: {{ event.name }}</h1>
+    <p>
+      Link gửi lời chúc:
+      <a href="{{ url_for('wish_form', slug=event.slug, _external=True) }}"
+        >{{ url_for('wish_form', slug=event.slug, _external=True) }}</a
+      >
+    </p>
+    <p>
+      QR:
+      <img
+        src="{{ url_for('qr_image', slug=event.slug) }}"
+        style="height: 120px"
+      />
+    </p>
+    <p>
+      <a href="{{ url_for('admin_export', slug=event.slug) }}">Export CSV</a>
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>STT</th>
+          <th>Tên</th>
+          <th>Lời chúc</th>
+          <th>Thời gian</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in wishes %}
+        <tr>
+          <td>{{ w.id }}</td>
+          <td>{{ w.sender_name }}</td>
+          <td>{{ w.message|e }}</td>
+          <td>{{ w.created_at }}</td>
+          <td>
+            <form
+              style="display: inline"
+              method="post"
+              action="{{ url_for('admin_delete_wish', slug=event.slug, wish_id=w.id) }}"
+            >
+              <button
+                type="submit"
+                onclick="return confirm('Xóa lời chúc này?')"
+              >
+                Xóa
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5">Chưa có lời chúc nào.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

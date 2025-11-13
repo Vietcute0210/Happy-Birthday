@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Gửi lời chúc - {{ event.name }}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Hiệu ứng bóng bay nổi */
+      .balloon {
+        position: fixed;
+        width: 50px;
+        height: 70px;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        animation: float 6s ease-in-out infinite;
+        z-index: 1;
+        opacity: 0.8;
+      }
+
+      .balloon::before {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        width: 2px;
+        height: 25px;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translateX(-50%);
+      }
+
+      .balloon:nth-child(1) {
+        left: 10%;
+        top: 20%;
+        background: #ff6b9d;
+        animation-delay: 0s;
+      }
+      .balloon:nth-child(2) {
+        left: 30%;
+        top: 40%;
+        background: #feca57;
+        animation-delay: 1s;
+      }
+      .balloon:nth-child(3) {
+        left: 50%;
+        top: 10%;
+        background: #48dbfb;
+        animation-delay: 2s;
+      }
+      .balloon:nth-child(4) {
+        left: 70%;
+        top: 30%;
+        background: #1dd1a1;
+        animation-delay: 1.5s;
+      }
+      .balloon:nth-child(5) {
+        left: 85%;
+        top: 50%;
+        background: #ff9ff3;
+        animation-delay: 0.5s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(-5deg);
+        }
+        50% {
+          transform: translateY(-30px) rotate(5deg);
+        }
+      }
+
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px;
+        border-radius: 30px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(10px);
+      }
+
+      /* Hiệu ứng viền sáng */
+      .container::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(45deg, #ff6b9d, #feca57, #48dbfb, #1dd1a1);
+        border-radius: 30px;
+        z-index: -1;
+        animation: glow 3s linear infinite;
+        background-size: 400%;
+      }
+
+      @keyframes glow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      h1 {
+        color: #e74c3c;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        animation: titleBounce 2s ease-in-out infinite;
+      }
+
+      @keyframes titleBounce {
+        0%,
+        100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .emoji-decoration {
+        text-align: center;
+        font-size: 3em;
+        margin-bottom: 20px;
+        animation: spin 4s linear infinite;
+      }
+
+      @keyframes spin {
+        0%,
+        90% {
+          transform: rotate(0deg);
+        }
+        95% {
+          transform: rotate(15deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+        color: #555;
+        font-weight: 600;
+        font-size: 1.1em;
+      }
+
+      input[name="sender_name"],
+      textarea {
+        width: 100%;
+        padding: 15px;
+        border: 3px solid #e0e0e0;
+        border-radius: 15px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+        font-family: inherit;
+      }
+
+      input[name="sender_name"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+      }
+
+      textarea {
+        height: 140px;
+        resize: vertical;
+      }
+
+      button[type="submit"] {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-weight: bold;
+        font-size: 1.3em;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        position: relative;
+        overflow: hidden;
+      }
+
+      button[type="submit"]::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+      }
+
+      button[type="submit"]:hover::before {
+        width: 300px;
+        height: 300px;
+      }
+
+      button[type="submit"]:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+      }
+
+      button[type="submit"]:active {
+        transform: translateY(-1px);
+      }
+
+      .flash-success {
+        padding: 20px;
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+        border: 3px solid #28a745;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.2em;
+        animation: slideDown 0.5s ease;
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          #667eea,
+          transparent
+        );
+        margin: 30px 0;
+      }
+
+      .note {
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+      }
+
+      /* Hiệu ứng sparkle */
+      .sparkle {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: sparkleFloat 2s ease-out forwards;
+        z-index: 100;
+      }
+
+      @keyframes sparkleFloat {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100px) scale(0);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Bóng bay nổi -->
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+    <div class="balloon"></div>
+
+    <div class="container">
+      <div class="emoji-decoration">🎂🎉🎈</div>
+      <h1>Gửi lời chúc tới: {{ event.name }}</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for cat, msg in messages %}
+      <div class="flash-success" id="flash-message">{{ msg }}</div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <form
+        method="post"
+        action="{{ url_for('submit_wish', slug=event.slug) }}"
+      >
+        <label>
+          🙋 Tên (không bắt buộc)
+          <input name="sender_name" placeholder="Tên bạn (ví dụ: An)" />
+        </label>
+
+        <label>
+          💌 Lời chúc
+          <textarea
+            name="message"
+            placeholder="Viết những lời chúc tốt đẹp nhất dành cho {{ event.name }}..."
+            required
+          ></textarea>
+        </label>
+
+        <button type="submit">🎁 Gửi lời chúc 🎂</button>
+      </form>
+
+      <hr />
+      <p class="note">
+        📱 Bạn có thể quét mã QR được phát tại buổi tiệc để truy cập trang này
+        nhanh hơn!
+      </p>
+    </div>
+
+    <script>
+      const flashMessage = document.getElementById("flash-message");
+
+      // Pháo hoa khi gửi thành công
+      if (
+        flashMessage &&
+        flashMessage.textContent.includes("Cảm ơn! Lời chúc đã được lưu.")
+      ) {
+        // Pháo hoa chính giữa
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          origin: { y: 0.6 },
+        });
+
+        // Pháo hoa từ hai bên
+        setTimeout(function () {
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            angle: 60,
+            origin: { x: 0, y: 0.9 },
+          });
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            angle: 120,
+            origin: { x: 1, y: 0.9 },
+          });
+        }, 500);
+
+        // Pháo hoa vàng kim tuyến
+        setTimeout(function () {
+          confetti({
+            particleCount: 100,
+            spread: 120,
+            startVelocity: 45,
+            ticks: 100,
+            colors: ["#FFD700", "#FFA500", "#FF6347"],
+            origin: { y: 0.5 },
+          });
+        }, 1000);
+      }
+
+      // Hiệu ứng sparkle khi di chuột
+      document.addEventListener("mousemove", function (e) {
+        if (Math.random() > 0.9) {
+          const sparkle = document.createElement("div");
+          sparkle.className = "sparkle";
+          sparkle.style.left = e.pageX + "px";
+          sparkle.style.top = e.pageY + "px";
+          document.body.appendChild(sparkle);
+
+          setTimeout(() => sparkle.remove(), 2000);
+        }
+      });
+
+      // Hiệu ứng confetti khi click vào form
+      const submitBtn = document.querySelector('button[type="submit"]');
+      submitBtn.addEventListener("click", function (e) {
+        // Tạo hiệu ứng nhỏ khi click
+        confetti({
+          particleCount: 30,
+          spread: 50,
+          origin: {
+            x: e.clientX / window.innerWidth,
+            y: e.clientY / window.innerHeight,
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

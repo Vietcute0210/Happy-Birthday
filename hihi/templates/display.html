@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chúc Mừng Sinh Nhật - {{ event.name }}</title>
+    <style>
+      /* Thiết kế giao diện trình chiếu */
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #2c3e50; /* Màu nền tối */
+        color: white;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
+      #header {
+        padding: 20px;
+        background: #e74c3c; /* Màu đỏ nổi bật */
+      }
+      h1 {
+        margin: 0;
+        font-size: 2.5em;
+      }
+      #wishes-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .wish-card {
+        background: #34495e; /* Màu card tối */
+        border-radius: 15px;
+        margin: 15px;
+        padding: 20px;
+        width: 300px;
+        text-align: left;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        /* animation nhẹ cho lời chúc mới */
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .wish-card h4 {
+        color: #f1c40f;
+        margin-top: 0;
+        font-size: 1.2em;
+        border-bottom: 1px solid #4a637a;
+        padding-bottom: 5px;
+      }
+      .wish-card p {
+        font-size: 1.1em;
+        line-height: 1.4;
+        white-space: pre-wrap;
+      }
+      .wish-card small {
+        display: block;
+        text-align: right;
+        margin-top: 10px;
+        color: #bdc3c7;
+        font-style: italic;
+      }
+      .total-count {
+        font-size: 1.5em;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <h1>🎉 Chúc Mừng {{ event.name }}! 🎉</h1>
+      <div class="total-count">
+        Tổng số lời chúc: <span id="wish-count">0</span>
+      </div>
+    </div>
+
+    <div id="wishes-container"></div>
+
+    <script>
+      const slug = "{{ event.slug }}";
+      const container = document.getElementById("wishes-container");
+      const countDisplay = document.getElementById("wish-count");
+
+      // Hàm lấy dữ liệu và cập nhật giao diện
+      function fetchWishes() {
+        fetch(`/api/${slug}/wishes`)
+          .then((response) => response.json())
+          .then((data) => {
+            countDisplay.textContent = data.total;
+            renderWishes(data.wishes);
+          })
+          .catch((error) => console.error("Lỗi khi lấy lời chúc:", error));
+      }
+
+      // Hàm render HTML từ dữ liệu JSON
+      function renderWishes(wishes) {
+        // Lấy ID của các lời chúc HIỆN TẠI trên màn hình
+        const existingIds = new Set(
+          Array.from(container.children).map((card) => card.dataset.wishId)
+        );
+
+        wishes.forEach((wish) => {
+          // Chỉ thêm lời chúc nếu ID chưa tồn tại
+          if (!existingIds.has(String(wish.id))) {
+            const card = document.createElement("div");
+            card.className = "wish-card";
+            card.dataset.wishId = wish.id;
+
+            card.innerHTML = `
+                        <h4>Từ: ${wish.sender}</h4>
+                        <p>${wish.message}</p>
+                        <small>Gửi lúc: ${wish.when}</small>
+                    `;
+
+            // Thêm lời chúc mới lên đầu để dễ thấy
+            container.prepend(card);
+          }
+        });
+
+        // Giới hạn số lượng thẻ hiển thị (ví dụ 30 thẻ) để tránh quá tải
+        while (container.children.length > 30) {
+          container.removeChild(container.lastChild);
+        }
+      }
+
+      // 1. Chạy lần đầu ngay khi tải trang
+      fetchWishes();
+
+      // 2. Thiết lập chạy tự động mỗi 5 giây
+      setInterval(fetchWishes, 5000);
+    </script>
+  </body>
+</html>
