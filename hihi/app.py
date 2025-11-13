@@ -8,8 +8,6 @@ import qrcode
 # from datetime import datetime # Đã import ở trên
 
 app = Flask(__name__)
-with app.app_context():
-    db.create_all()
 
 app.config['SECRET_KEY'] = 'replace-this-with-a-secret'
 # SQLite DB file
@@ -36,13 +34,14 @@ class Wish(db.Model):
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
+with app.app_context():
+    db.create_all()
 # --------------------
 # Helpers
 # --------------------
-def ensure_db():
-    # tạo DB nếu chưa tồn tại
-    db.create_all()
+# def ensure_db():
+#     # tạo DB nếu chưa tồn tại
+#     db.create_all()
 
 def generate_qr_bytes(url, box_size=10):
     qr = qrcode.QRCode(box_size=box_size, border=2)
