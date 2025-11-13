@@ -8,6 +8,9 @@ import qrcode
 # from datetime import datetime # Đã import ở trên
 
 app = Flask(__name__)
+with app.app_context():
+    db.create_all()
+
 app.config['SECRET_KEY'] = 'replace-this-with-a-secret'
 # SQLite DB file
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/wishes.db'
